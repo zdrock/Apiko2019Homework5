@@ -1,8 +1,8 @@
-import React from "react";
-import AppContainer from "./components/AppContainer";
-import { Provider } from "react-redux";
-import { ConnectedRouter } from "connected-react-router";
-import configureStore, { history } from "./configureStore";
+import React from 'react';
+import AppContainer from './components/AppContainer';
+import { Provider } from 'react-redux';
+import { ConnectedRouter } from 'connected-react-router';
+import configureStore, { history } from './configureStore';
 
 const store = configureStore();
 

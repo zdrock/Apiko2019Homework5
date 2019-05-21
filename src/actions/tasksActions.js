@@ -1,14 +1,14 @@
-import uuid from "uuid";
-import storage from "../api/storage";
+import uuid from 'uuid';
+import storage from '../api/storage';
 
 export function getTasks() {
   const tasks = storage.getTasks() || [];
 
   return {
-    type: "GET_TASKS",
+    type: 'GET_TASKS',
     payload: {
-      tasks: tasks
-    }
+      tasks: tasks,
+    },
   };
 }
 
@@ -16,69 +16,69 @@ export function createTask(title) {
   const newTask = {
     id: uuid.v4(),
     title,
-    checked: false
+    checked: false,
   };
 
-  return dispatch => {
+  return (dispatch) => {
     dispatch({
-      type: "CREATE_TASK",
+      type: 'CREATE_TASK',
       payload: {
-        ...newTask
-      }
+        ...newTask,
+      },
     });
     dispatch(saveToLocal());
   };
 }
 
 export function deleteTask(id) {
-  return dispatch => {
+  return (dispatch) => {
     dispatch({
-      type: "DELETE_TASK",
+      type: 'DELETE_TASK',
       payload: {
-        id
-      }
+        id,
+      },
     });
     dispatch(saveToLocal());
   };
 }
 
 export function toggleTask(id) {
-  return dispatch => {
+  return (dispatch) => {
     dispatch({
-      type: "TOGGLE_TASK",
+      type: 'TOGGLE_TASK',
       payload: {
-        id
-      }
+        id,
+      },
     });
     dispatch(saveToLocal());
   };
 }
 
 export function toggleAll() {
-  return dispatch => {
+  return (dispatch) => {
     dispatch({
-      type: "TOGGLE_ALL"
+      type: 'TOGGLE_ALL',
     });
     dispatch(saveToLocal());
   };
 }
 
 export function editTask({ id, title }) {
-  return dispatch => {
-    if (title.trim() === "") {
+  return (dispatch) => {
+    if (title.trim() === '') {
       dispatch({
-        type: "DELETE_TASK",
+        type: 'DELETE_TASK',
         payload: {
-          id
-        }
+          id,
+        },
       });
     } else {
       dispatch({
-        type: "EDIT_TASK",
+        type: 'EDIT_TASK',
         payload: {
           id,
-          title
-        }
+          title,
+        },
       });
     }
     dispatch(saveToLocal());
@@ -86,9 +86,9 @@ export function editTask({ id, title }) {
 }
 
 export function deleteCheckedTasks() {
-  return dispatch => {
+  return (dispatch) => {
     dispatch({
-      type: "DELETE_CHECKED_TASKS"
+      type: 'DELETE_CHECKED_TASKS',
     });
     dispatch(saveToLocal());
   };
@@ -96,6 +96,6 @@ export function deleteCheckedTasks() {
 
 function saveToLocal() {
   return {
-    type: "SAVE_TO_LOCAL"
+    type: 'SAVE_TO_LOCAL',
   };
 }

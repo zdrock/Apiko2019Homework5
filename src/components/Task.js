@@ -1,6 +1,8 @@
-import React from "react";
-import styled from "styled-components";
-import { compose, withHandlers, withStateHandlers, pure } from "recompose";
+import React from 'react';
+import styled from 'styled-components';
+import { compose, withHandlers, withStateHandlers } from 'recompose';
+import * as tasksActions from '../modules/tasks/tasksActions';
+import { connect } from 'react-redux';
 
 const TaskWrapper = styled.div`
   position: relative;
@@ -10,7 +12,7 @@ const TaskWrapper = styled.div`
 
 const TaskContent = styled.div`
   font-size: 24px;
-  font-family: "Helvetica Neue", Helvetica, Arial;
+  font-family: 'Helvetica Neue', Helvetica, Arial;
   border: none;
   width: 100%;
   height: 100%;
@@ -32,6 +34,10 @@ const DeleteButtonStyled = styled.button`
   border: 0;
   background: none;
   outline: none;
+  transition: 0.2s;
+  :hover {
+    color: #af5b5e;
+  }
 `;
 
 const StyledCheckbox = styled.button`
@@ -59,11 +65,11 @@ const CheckmarkStyled = styled.span`
 `;
 
 const EditableContent = styled.input.attrs({
-  autoFocus: true
+  autoFocus: true,
 })`
   position: relative;
   font-size: 24px;
-  font-family: "Helvetica Neue", Helvetica, Arial;
+  font-family: 'Helvetica Neue', Helvetica, Arial;
   border: 1px solid #999999;
   padding: 5px;
   outline: none;
@@ -84,7 +90,7 @@ const Task = ({
   handleEditTitle,
   handleBlur,
   handleToggleTitle,
-  handleDeleteTask
+  handleDeleteTask,
 }) => (
   <TaskWrapper onMouseOver={handleMouseEnter} onMouseLeave={handleMouseLeave}>
     {!toggledTitle && (
@@ -99,7 +105,7 @@ const Task = ({
         onChange={handleEditTitle}
         onBlur={handleBlur}
         onKeyDown={e => {
-          if (e.key === "Enter") {
+          if (e.key === 'Enter') {
             handleBlur();
           }
         }}
@@ -123,29 +129,36 @@ const Task = ({
 );
 
 export default compose(
+  connect(
+    null,
+    {
+      onDeleteTask: tasksActions.deleteTask,
+      onToggleTask: tasksActions.toggleTask,
+      onEditTask: tasksActions.editTask,
+    }
+  ),
   withStateHandlers(
-    { hovered: false, editedTitle: "", toggledTitle: false },
+    { hovered: false, editedTitle: '', toggledTitle: false },
     {
       handleEditTitle: (state, props) => e => ({ editedTitle: e.target.value }),
       handleToggleTitle: (state, props) => () => ({
         toggledTitle: true,
-        editedTitle: props.title
+        editedTitle: props.title,
       }),
       handleMouseEnter: (state, props) => () => ({ hovered: true }),
       handleMouseLeave: (state, props) => () => ({ hovered: false }),
       handleBlur: (state, props) => () => {
         props.onEditTask({ id: props.id, title: state.editedTitle });
         return { toggledTitle: false };
-      }
+      },
     }
   ),
-  pure,
   withHandlers({
     handleToggleTask: props => event => {
       props.onToggleTask(props.id);
     },
     handleDeleteTask: props => event => {
       props.onDeleteTask(props.id);
-    }
+    },
   })
 )(Task);

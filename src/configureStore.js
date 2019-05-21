@@ -1,10 +1,13 @@
-import { createBrowserHistory } from "history";
-import { applyMiddleware, compose, createStore } from "redux";
-import { routerMiddleware } from "connected-react-router";
-import createRootReducer from "./reducers";
-import thunk from "redux-thunk";
+import { createBrowserHistory } from 'history';
+import { applyMiddleware, compose, createStore } from 'redux';
+import { routerMiddleware } from 'connected-react-router';
+import createRootReducer from './reducers';
+import thunk from 'redux-thunk';
+import tasksSaga from './sagas/tasks/tasksSagas';
+import createSagaMiddleware from 'redux-saga';
 
 export const history = createBrowserHistory();
+const sagaMiddleware = createSagaMiddleware();
 
 export default function configureStore(preloadedState) {
   const store = createStore(
@@ -13,10 +16,12 @@ export default function configureStore(preloadedState) {
     compose(
       applyMiddleware(
         routerMiddleware(history), // for dispatching history actions
-        thunk
+        thunk,
+        sagaMiddleware
       )
     )
   );
+  sagaMiddleware.run(tasksSaga);
 
   return store;
 }

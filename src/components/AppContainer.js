@@ -1,11 +1,15 @@
-import { Route, Switch, NavLink } from "react-router-dom";
-import React from "react";
-import Input from "./Input";
-import TasksList from "./TasksList";
-import { getTasks, deleteCheckedTasks } from "../actions/tasksActions";
-import { connect } from "react-redux";
-import styled from "styled-components";
-import { compose, lifecycle } from "recompose";
+import { Route, Switch, NavLink } from 'react-router-dom';
+import React from 'react';
+import Input from './Input';
+import TasksList from './TasksList';
+import * as tasksActions from '../modules/tasks/tasksActions';
+import { connect } from 'react-redux';
+import styled from 'styled-components';
+import { compose, lifecycle } from 'recompose';
+import {
+  getUncompletedTasks,
+  getCompletedTasks,
+} from '../modules/tasks/tasksSelectors';
 
 const AppContainerStyled = styled.div`
   display: flex;
@@ -33,7 +37,7 @@ const NavLinkStyled = styled(NavLink)`
   text-decoration: none;
   color: #777;
   font-size: 14px;
-  font-family: "Helvetica Neue", Helvetica, Arial;
+  font-family: 'Helvetica Neue', Helvetica, Arial;
   border: 1px solid white;
   border-radius: 3px;
   margin-left: 5px;
@@ -49,12 +53,12 @@ const NavLinkStyled = styled(NavLink)`
 const ClearCompletedButton = styled.button`
   color: #777;
   font-size: 14px;
-  font-family: "Helvetica Neue", Helvetica, Arial;
+  font-family: 'Helvetica Neue', Helvetica, Arial;
   border: none;
   background: none;
   cursor: pointer;
   outline: none;
-  visibility: ${props => (props.completedTasksExist ? "visible" : "hidden")};
+  visibility: ${props => (props.completedTasksExist ? 'visible' : 'hidden')};
   :hover {
     text-decoration: underline;
   }
@@ -64,14 +68,14 @@ const ItemsLeftStyled = styled.span`
   text-align: left;
   color: #777;
   font-size: 14px;
-  font-family: "Helvetica Neue", Helvetica, Arial;
+  font-family: 'Helvetica Neue', Helvetica, Arial;
 `;
 
 const AppContainer = ({
-  itemsLeft,
+  uncompletedTasksLength,
   tasksExist,
   completedTasksExist,
-  onDeleteCheckedTasks
+  onDeleteCheckedTasks,
 }) => (
   <AppContainerStyled>
     <Input />
@@ -84,7 +88,7 @@ const AppContainer = ({
 
     {tasksExist && (
       <NavigationContainer>
-        <ItemsLeftStyled>{itemsLeft} items left</ItemsLeftStyled>
+        <ItemsLeftStyled>{uncompletedTasksLength} items left</ItemsLeftStyled>
         <NavLinksContainer>
           <NavLinkStyled exact to="/">
             All
@@ -104,30 +108,24 @@ const AppContainer = ({
 );
 
 const mapStateToProps = state => {
-  const { tasks } = state.tasks;
-  const tasksExist = tasks.length > 0;
-  const completedTasksExist = tasks.filter(t => t.checked).length > 0;
-  const itemsLeft = tasks.filter(t => !t.checked).length;
   return {
-    tasksExist: tasksExist,
-    completedTasksExist: completedTasksExist,
-    itemsLeft: itemsLeft
+    tasksExist: state.tasks.tasks.length > 0,
+    completedTasksExist: getCompletedTasks(state).length > 0,
+    uncompletedTasksLength: getUncompletedTasks(state).length,
   };
 };
-
-const mapDispatchToProps = dispatch => ({
-  onDeleteCheckedTasks: () => dispatch(deleteCheckedTasks()),
-  onGetTasks: () => dispatch(getTasks())
-});
 
 export default compose(
   connect(
     mapStateToProps,
-    mapDispatchToProps
+    {
+      onDeleteCheckedTasks: tasksActions.deleteCheckedTasks,
+      onGetTasks: tasksActions.getStoredTasksStarted,
+    }
   ),
   lifecycle({
     componentDidMount() {
       this.props.onGetTasks();
-    }
+    },
   })
 )(AppContainer);

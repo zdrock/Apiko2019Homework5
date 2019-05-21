@@ -1,13 +1,13 @@
 const storage = {
   getTasks() {
-    if (sessionStorage.getItem("tasks")) {
-      return JSON.parse(sessionStorage.getItem("tasks"));
+    if (localStorage.getItem('tasks')) {
+      return JSON.parse(localStorage.getItem('tasks'));
     } else {
       return false;
     }
   },
   setTasks(tasks) {
-    sessionStorage.setItem("tasks", JSON.stringify(tasks));
-  }
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+  },
 };
 export default storage;

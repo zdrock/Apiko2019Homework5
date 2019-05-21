@@ -1,9 +1,9 @@
-import React from "react";
-import { connect } from "react-redux";
-import { createTask } from "../actions/tasksActions";
-import styled from "styled-components";
-import ToggleAllCheckbox from "./ToggleAllCheckbox";
-import { compose, withStateHandlers } from "recompose";
+import React from 'react';
+import { connect } from 'react-redux';
+import * as tasksActions from '../modules/tasks/tasksActions';
+import styled from 'styled-components';
+import ToggleAllCheckbox from './ToggleAllCheckbox';
+import { compose, withStateHandlers } from 'recompose';
 
 const InputWrapper = styled.div`
   position: relative;
@@ -14,7 +14,7 @@ const InputWrapper = styled.div`
 
 const InputStyled = styled.input`
   font-size: 24px;
-  font-family: "Helvetica Neue", Helvetica, Arial;
+  font-family: 'Helvetica Neue', Helvetica, Arial;
   border: none;
   width: 100%;
   height: 100%;
@@ -34,7 +34,7 @@ const InputComponent = ({ tasksExist, value, onChange, onSubmit }) => (
       placeholder="What needs to be done?"
       onChange={onChange}
       onKeyDown={e => {
-        if (e.key === "Enter") {
+        if (e.key === 'Enter') {
           onSubmit();
         }
       }}
@@ -42,34 +42,28 @@ const InputComponent = ({ tasksExist, value, onChange, onSubmit }) => (
   </InputWrapper>
 );
 
-const mapDispatchToProps = dispatch => ({
-  onCreateTask: title => dispatch(createTask(title))
-});
-
 const mapStateToProps = state => {
-  const { tasks } = state.tasks;
-  const tasksExist = tasks.length > 0;
   return {
-    tasksExist: tasksExist
+    tasksExist: state.tasks.tasks.length > 0,
   };
 };
 
 export default compose(
   connect(
     mapStateToProps,
-    mapDispatchToProps
+    { createTask: tasksActions.createTask }
   ),
   withStateHandlers(
-    { value: "" },
+    { value: '' },
     {
       onChange: (state, props) => e => ({ value: e.target.value }),
       onSubmit: (state, props) => () => {
         if (!state.value) {
           return {};
         }
-        props.onCreateTask(state.value);
-        return { value: "" };
-      }
+        props.createTask(state.value);
+        return { value: '' };
+      },
     }
   )
 )(InputComponent);
